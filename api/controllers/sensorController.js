@@ -2,7 +2,9 @@
 
 var mongoose = require('mongoose'),
   Sensor = mongoose.model('Sensors'),
-  jwt = require('jsonwebtoken');
+  auth = require('./middleware'),
+  jwt = require('jsonwebtoken'),
+  User = mongoose.model('Users');
 
 exports.list_all_sensors = function(req, res) {
   Sensor.find({}, function(err, sensor) {
@@ -44,6 +46,105 @@ exports.delete_a_sensor = function(req, res) {
     if (err)
       res.send(err);
     res.json({ sensor: 'Sensor successfully deleted' });
+  });
+};
+
+//User
+exports.create_a_user = function(req, res, next) {
+    User.findOne({'username':req.body.username}, 'username', function(err, user) {
+      if (user == null) {
+        var new_user = new User(req.body);
+        new_user.save(function(err, user) {
+          if (err)
+            res.send(err);
+          res.status(200).json(user);
+        });
+      }else{
+        res.send({'error':'Username already in use.'});
+      }
+    });
+};
+
+exports.list_all_users = function(req, res, next) {
+  
+  try{
+    User.find({}, function(err, user) {
+      if (err)
+        res.send(err);
+      res.status(200).json(user);
+    });
+  }catch(err){}
+};
+
+exports.read_a_user = function(req, res, next) {
+  try{
+    User.findOne({'username':req.params.username}, function(err, user) {
+      if (err)
+        res.send(err);
+      res.status(200).json(user);
+    });
+  }catch(err){}
+};
+
+exports.update_a_user = function(req, res, next) {
+  
+  try{
+    User.findOneAndUpdate({_id: req.params._id}, req.body, { new: true }, function(err, user) {
+      if (err)
+        res.send(err);
+      res.status(200).json(user);
+    });
+  }catch(err){}
+};
+
+exports.delete_a_user = function(req, res, next) {
+  
+  try{
+    User.remove({
+      _id: req.params.userId
+    }, function(err, user) {
+      if (err)
+        res.send(err);
+      res.status(200).json({ message: 'Report successfully deleted' });
+    });
+  }catch(err){}
+};
+
+exports.authenticate = function(req, res, next) {
+
+  // find the user
+  
+  User.findOne({'username':req.body.username}, function(err, user) {
+
+      if (!user) {
+        res.status(401).json({ success: false, message: 'Authentication failed. User not found.' });
+      } else if (user) {
+
+        // check if password matches
+        if (user.password != req.body.password) {
+          res.status(401).json({ success: false, message: 'Authentication failed. Wrong password.' });
+        } else {
+
+          const plainUserObject = {
+            username: user.username,
+            password: user.password
+          }
+
+          // if user is found and password is right
+          // create a token
+          var token = jwt.sign(plainUserObject, "@tomada_machine", {
+            expiresIn: "10h"
+          });
+
+          // return the information including token as JSON
+          res.status(200).json({
+            success: true,
+            message: 'Enjoy your token!',
+            token: token
+          });
+        }   
+
+      }
   });
 };
 

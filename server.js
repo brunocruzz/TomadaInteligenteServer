@@ -2,6 +2,8 @@ var express = require('express'),
   app = express(),
   port = process.env.PORT || 3000,
   mongoose = require('mongoose'),
+  User = require('./api/models/userModel'),
+  jwt = require('jsonwebtoken'),
   Sensor = require('./api/models/sensorModel'),
   bodyParser = require('body-parser');
 

@@ -52,7 +52,7 @@ exports.delete_a_sensor = function(req, res) {
 //User
 exports.create_a_user = function(req, res, next) {
     User.findOne({'username':req.body.username}, 'username', function(err, user) {
-      if (user.username == null) {
+      if (user == null) {
         var new_user = new User(req.body);
         new_user.save(function(err, user) {
           if (err)

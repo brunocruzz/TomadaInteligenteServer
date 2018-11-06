@@ -8,11 +8,20 @@ module.exports = function(app) {
     .get(sensors.list_all_sensors)
     .post(sensors.create_a_sensor);
 
-
   app.route('/sensors/:sensorId').get(sensors.read_a_sensor)
     .put(sensors.update_a_sensor)
     .delete(sensors.delete_a_sensor);
+    
+  // values routes
+  app.route('/values')
+    .get(sensors.list_all_values)
+    .post(sensors.create_a_value);
 
+  app.route('/values/:valueId').get(sensors.read_a_value)
+    .put(sensors.update_a_value)
+    .delete(sensors.delete_a_value);
+
+  // values routes
   app.route('/users')
   	.get(sensors.list_all_users)
   	.post(sensors.create_a_user);

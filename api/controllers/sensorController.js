@@ -2,8 +2,10 @@
 
 var mongoose = require('mongoose'),
   Sensor = mongoose.model('Sensors'),
+  Value = mongoose.model('Values'),
   auth = require('./middleware'),
   jwt = require('jsonwebtoken'),
+  io = require('../../server').io,
   User = mongoose.model('Users');
 
 exports.list_all_sensors = function(req, res) {
@@ -46,6 +48,66 @@ exports.delete_a_sensor = function(req, res) {
     if (err)
       res.send(err);
     res.json({ sensor: 'Sensor successfully deleted' });
+  });
+};
+
+//Value
+exports.list_all_values = function(req, res) {
+  console.log(req.query.initialDate)
+  console.log(req.query.finalDate)
+  console.log("LOL")
+  if (req.query.initialDate == null || req.query.finalDate == null){
+    Value.find({}, function(err, value) {
+      if (err)
+        res.send(err);
+      res.json(value);
+    });
+  }else {
+    io.emit('event', {});
+    Value.find({Created_date: {"$gte": new Date(req.query.initialDate), "$lt": new Date(req.query.finalDate)}, sensorId: req.query.sensorId}, function(err, value) {
+      if (err)
+        res.send(err);
+      res.json(value);
+    });
+  }
+  
+};
+
+exports.create_a_value = function(req, res) {
+  var new_sensor = new Value(req.body);
+  new_sensor.save(function(err, value) {
+    if (err){
+      res.send(err);
+    }else{
+      res.json(value);
+      io.emit('value added', { for: 'everyone' });
+    }
+  });
+};
+
+exports.read_a_value = function(req, res) {
+  Value.findById(req.params.valueId, function(err, value) {
+    if (err)
+      res.send(err);
+    res.json(value);
+  });
+};
+
+exports.update_a_value = function(req, res) {
+  Value.findOneAndUpdate({_id: req.params.sensorId}, req.body, {new: true}, function(err, value) {
+    if (err)
+      res.send(err);
+    res.json(value);
+  });
+};
+
+exports.delete_a_value = function(req, res) {
+  Value.remove({
+    _id: req.params.sensorId
+  }, function(err, value) {
+    if (err)
+      res.send(err);
+    res.json({ value: 'Sensor successfully deleted' });
   });
 };
 

@@ -2,8 +2,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var sensorSchema = new Schema({
-  ledState: {
+var valueSchema = new Schema({
+  value: {
+    type: Number
+  },
+  sensorId: {
     type: String
   },
   Created_date: {
@@ -12,4 +15,4 @@ var sensorSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('Sensors', sensorSchema);
+module.exports = mongoose.model('Values', valueSchema);

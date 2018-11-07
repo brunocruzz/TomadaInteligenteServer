@@ -1,5 +1,5 @@
 var app = require('express')(),
-  server = require('http').createServer(),
+  server = require('http').Server(app),
   io = require('socket.io')(server),
   port = process.env.PORT || 3000,
   mongoose = require('mongoose'),
@@ -31,6 +31,7 @@ app.use(bodyParser.json());
 app.get('/test', function(req, res) { res.json({data : 'hello'});})
 
 io.on('connection', function(socket){
+
     console.log('connection');
     console.log('server: sending ping');
     socket.on('pong', function() {
@@ -40,7 +41,10 @@ io.on('connection', function(socket){
     socket.on('message', function(message) {
         console.log('server received message: ' + message);
     });
-    socket.emit('ping');
+    socket.on('disconnect', function(){
+      console.log('disconnect');
+    });
+    io.emit('ping');
 });
 
 io.on('lol', function(client){

@@ -80,7 +80,7 @@ exports.create_a_value = function(req, res) {
       res.send(err);
     }else{
       res.json(value);
-      io.emit('value added', { for: 'everyone' });
+      io.emit('value_added', { value: value.value });
     }
   });
 };

@@ -68,7 +68,7 @@ exports.list_all_values = function(req, res) {
       if (err)
         res.send(err);
       res.json(value);
-    });
+    }).sort("Created_date");
   }
   
 };
